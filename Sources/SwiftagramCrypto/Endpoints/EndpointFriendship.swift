@@ -20,19 +20,17 @@ public extension Endpoint.Friendship {
     ///     - transformation: A `KeyPath` defining the endpoint path.
     ///     - identifier: A `String` holding reference to a valid user identifier.
     /// - note: **SwiftagramCrypto** only.
-    private static func edit(_ keyPath: KeyPath<Request, Request>, _ identifier: String) -> Endpoint.Disposable<Status> {
+    private static func edit(_ keyPath: KeyPath<Request, Request>, _ identifier: String) -> Endpoint.Results<Status> {
         base[keyPath: keyPath]
-            .appending(path: identifier)
-            .appending(path: "/")
-            .prepare(process: Status.self)
-            .locking(Secret.self) {
-                $0.appending(header: $1.header)
-                    .signing(body: ["_csrftoken": $1["csrftoken"],
-                                    "user_id": identifier,
-                                    "radio_type": "wifi-none",
-                                    "_uid": $1.identifier,
-                                    "device_id": $1.client.device.instagramIdentifier,
-                                    "_uuid": $1.client.device.identifier.uuidString])
+            .path(appending: identifier)
+            .path(appending: "/")
+            .finalize {
+                $0.signing(body: ["_csrftoken": $2["csrftoken"],
+                                  "user_id": identifier,
+                                  "radio_type": "wifi-none",
+                                  "_uid": $2.label,
+                                  "device_id": $2.client.device.instagramIdentifier,
+                                  "_uuid": $2.client.device.identifier.uuidString])
         }
     }
 
@@ -40,7 +38,7 @@ public extension Endpoint.Friendship {
     ///
     /// - parameter identifier: A `String` holding reference to a valid user identifier.
     /// - note: **SwiftagramCrypto** only.
-    static func follow(_ identifier: String) -> Endpoint.Disposable<Status> {
+    static func follow(_ identifier: String) -> Endpoint.Results<Status> {
         edit(\.create, identifier)
     }
 
@@ -48,7 +46,7 @@ public extension Endpoint.Friendship {
     ///
     /// - parameter identifier: A `String` holding reference to a valid user identifier.
     /// - note: **SwiftagramCrypto** only.
-    static func unfollow(_ identifier: String) -> Endpoint.Disposable<Status> {
+    static func unfollow(_ identifier: String) -> Endpoint.Results<Status> {
         edit(\.destroy, identifier)
     }
 
@@ -56,7 +54,7 @@ public extension Endpoint.Friendship {
     ///
     /// - parameter identifier: A `String` holding reference to a valid user identifier.
     /// - note: **SwiftagramCrypto** only.
-    static func remove(follower identifier: String) -> Endpoint.Disposable<Status> {
+    static func remove(follower identifier: String) -> Endpoint.Results<Status> {
         edit(\.remove_follower, identifier)
     }
 
@@ -64,7 +62,7 @@ public extension Endpoint.Friendship {
     ///
     /// - parameter identifier: A `String` holding reference to a valid user identifier.
     /// - note: **SwiftagramCrypto** only.
-    static func acceptRequest(from identifier: String) -> Endpoint.Disposable<Status> {
+    static func acceptRequest(from identifier: String) -> Endpoint.Results<Status> {
         edit(\.approve, identifier)
     }
 
@@ -72,7 +70,7 @@ public extension Endpoint.Friendship {
     ///
     /// - parameter identifier: A `String` holding reference to a valid user identifier.
     /// - note: **SwiftagramCrypto** only.
-    static func rejectRequest(from identifier: String) -> Endpoint.Disposable<Status> {
+    static func rejectRequest(from identifier: String) -> Endpoint.Results<Status> {
         edit(\.reject, identifier)
     }
 
@@ -80,7 +78,7 @@ public extension Endpoint.Friendship {
     ///
     /// - parameter identifier: A `String` holding reference to a valid user identifier.
     /// - note: **SwiftagramCrypto** only.
-    static func block(_ identifier: String) -> Endpoint.Disposable<Status> {
+    static func block(_ identifier: String) -> Endpoint.Results<Status> {
         edit(\.block, identifier)
     }
 
@@ -88,7 +86,7 @@ public extension Endpoint.Friendship {
     ///
     /// - parameter identifier: A `String` holding reference to a valid user identifier.
     /// - note: **SwiftagramCrypto** only.
-    static func unblock(_ identifier: String) -> Endpoint.Disposable<Status> {
+    static func unblock(_ identifier: String) -> Endpoint.Results<Status> {
         edit(\.unblock, identifier)
     }
 }

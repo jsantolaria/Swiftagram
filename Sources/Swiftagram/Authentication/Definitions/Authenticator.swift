@@ -28,12 +28,3 @@ public protocol Authenticator {
     /// - note: Using `TransientStorage` as `Storage` allows to disregard any storing mechanism.
     func authenticate(_ onChange: @escaping (Result<Secret, Error>) -> Void)
 }
-
-public extension Requester {
-    /// An ephemeral `Requester` guaranteed to be fired immediately, provided as a convinience for custom `Authenticator`s.
-    ///
-    /// - warning: **Do not** use this to call your `Endpoint`s as Instagram spam filter will surely intervene after just a few call.
-    static let authentication = Requester(configuration: .init(sessionConfiguration: .default,
-                                                               dispatcher: .init(),
-                                                               waiting: 0...0))
-}

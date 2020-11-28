@@ -35,7 +35,7 @@ extension Int {
     }
 }
 
-extension BodyComposable where Self: BodyParsable {
+extension Body {
     /// Sign `body` and update the request accordingly.
     ///
     /// - parameter body: A valid `Wrapper`.
@@ -53,17 +53,15 @@ extension BodyComposable where Self: BodyParsable {
                                key: "937463b5272b5d60e9d20f0f8d7d192193dd95095a3ad43725d494300a5ea5fc".dataFromHexadecimalString()!)
                 .base64EncodedString()
             // Sign body.
-            return try appending(body: [
-                "signed_body": [hash, description].joined(separator: "."),
-                "ig_sig_key_version": "5"
-            ])
+            return self.body(appending: ["signed_body": [hash, description].joined(separator: "."),
+                                         "ig_sig_key_version": "5"])
         } catch {
             fatalError(["Exception raised when signing. \(error.localizedDescription).",
                         error.localizedDescription,
                         "Please open an issue at `https://github.com/sbertix/Swiftagram/issues`."].joined(separator: " "))
         }
     }
-
+    
     /// Sign `body` and update the request accordingly.
     ///
     /// - parameter body: A valid `Wrappable`.

@@ -6,10 +6,10 @@
 [![codecov](https://codecov.io/gh/sbertix/Swiftagram/branch/main/graph/badge.svg)](https://codecov.io/gh/sbertix/Swiftagram)
 [![Telegram](https://img.shields.io/badge/Telegram-Swiftagram-blue?style=flat&logo=telegram)](https://t.me/swiftagram)
 <br />
-![iOS](https://img.shields.io/badge/iOS-9.0-ff69b4)
-![macOS](https://img.shields.io/badge/macOS-10.12-ff69b4)
-![tvOS](https://img.shields.io/badge/tvOS-11.0-ff69b4)
-![watchOS](https://img.shields.io/badge/watchOS-3.0-ff69b4)
+![iOS](https://img.shields.io/badge/iOS-9.0-ef5337)
+![macOS](https://img.shields.io/badge/macOS-10.12-ef5337)
+![tvOS](https://img.shields.io/badge/tvOS-11.0-ef5337)
+![watchOS](https://img.shields.io/badge/watchOS-3.0-ef5337)
 
 <br />
 

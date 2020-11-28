@@ -18,41 +18,41 @@ public extension Endpoint {
         /// All threads.
         ///
         /// - parameter page: An optional `String` holding reference to a valid cursor. Defaults to `nil`.
-        public static func inbox(startingAt page: String? = nil) -> Paginated<Conversation.Collection> {
+        public static func inbox(startingAt page: String? = nil) -> Results<Conversation.Collection> {
+            // TODO: Add back pagination.
             base.inbox
-                .appending(query: ["visual_message_return_type": "unseen",
+                .query(appending: ["visual_message_return_type": "unseen",
                                    "direction": page.flatMap { _ in "older" },
                                    "thread_message_limit": "10",
                                    "persistent_badging": "true",
                                    "limit": "20"])
-                .paginating(process: Conversation.Collection.self, key: "cursor", keyPath: \.oldestCursor, value: page)
-                .locking(Secret.self)
+                .finalize()
         }
 
         /// All pending threads.
         ///
         /// - parameter page: An optional `String` holding reference to a valid cursor. Defaults to `nil`.
-        public static func pendingInbox(startingAt page: String? = nil) -> Paginated<Conversation.Collection> {
-            base.appending(path: "pending_inbox")
-                .appending(query: ["visual_message_return_type": "unseen",
-                                   "direction": page.flatMap { _ in "older" },
-                                   "thread_message_limit": "10",
-                                   "persistent_badging": "true",
-                                   "limit": "20"])
-                .paginating(process: Conversation.Collection.self, key: "cursor", keyPath: \.oldestCursor, value: page)
-                .locking(Secret.self)
+        public static func pendingInbox(startingAt page: String? = nil) -> Results<Conversation.Collection> {
+            // TODO: Add back pagination.
+            base.path(appending: "pending_inbox")
+                .query(["visual_message_return_type": "unseen",
+                        "direction": page.flatMap { _ in "older" },
+                        "thread_message_limit": "10",
+                        "persistent_badging": "true",
+                        "limit": "20"])
+                .finalize()
         }
 
         /// Top ranked recipients matching `query`.
         ///
         /// - parameter query: An optional `String`.
-        public static func recipients(matching query: String? = nil) -> Disposable<Recipient.Collection> {
-            base.appending(path: "ranked_recipients/")
-                .appending(header: ["mode": "raven",
-                                    "query": query ?? "",
-                                    "show_threads": "true"])
-                .prepare(process: Recipient.Collection.self)
-                .locking(Secret.self)
+        public static func recipients(matching query: String? = nil) -> Results<Recipient.Collection> {
+            // TODO: Add back pagination.
+            base.path(appending: "ranked_recipients/")
+                .header(["mode": "raven",
+                         "query": query ?? "",
+                         "show_threads": "true"])
+                .finalize()
         }
 
         /// A thread matching `identifier`.
@@ -61,17 +61,17 @@ public extension Endpoint {
         ///     - identifier: A `String` holding reference to a valid thread identifier.
         ///     - page: An optional `String` holding reference to a valid cursor. Defaults to `nil`.
         public static func conversation(matching identifier: String,
-                                        startingAt page: String? = nil) -> Paginated<Conversation.Unit> {
+                                        startingAt page: String? = nil) -> Results<Conversation.Unit> {
+            // TODO: Add back pagination.
             base.threads
-                .appending(path: identifier)
-                .appending(query: ["visual_message_return_type": "unseen",
-                                   "direction": "older",
-                                   "limit": "20"])
-                .paginating(process: Conversation.Unit.self, key: "cursor", keyPath: \.thread.oldestCursor, value: page)
-                .locking(Secret.self)
+                .path(appending: identifier)
+                .query(["visual_message_return_type": "unseen",
+                        "direction": "older",
+                        "limit": "20"])
+                .finalize()
         }
 
         /// Get user presence.
-        public static let presence: Disposable<Wrapper> = base.appending(path: "get_presence/").prepare().locking(Secret.self)
+        public static let presence: Results<Wrapper> = base.path(appending: "get_presence/").finalize()
     }
 }

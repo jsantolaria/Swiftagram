@@ -16,19 +16,15 @@ public extension Endpoint {
         private static let base = Endpoint.version1.users.appendingDefaultHeader()
 
         /// A list of all profiles blocked by the user.
-        public static let blocked: Disposable<Wrapper> = base
-            .blocked_list
-            .prepare()
-            .locking(Secret.self)
+        public static let blocked: Results<Wrapper> = base.blocked_list.finalize()
 
         /// A user matching `identifier`'s info.
         /// 
         /// - parameter identifier: A `String` holding reference to a valid user identifier.
-        public static func summary(for identifier: String) -> Disposable<Swiftagram.User.Unit> {
-            base.appending(path: identifier)
+        public static func summary(for identifier: String) -> Results<Swiftagram.User.Unit> {
+            base.path(appending: identifier)
                 .info
-                .prepare(process: Swiftagram.User.Unit.self)
-                .locking(Secret.self)
+                .finalize()
         }
 
         /// All user matching `query`.
@@ -36,11 +32,11 @@ public extension Endpoint {
         /// - parameters:
         ///     - query: A `String` holding reference to a valid user query.
         ///     - page: An optional `String` holding reference to a valid cursor. Defaults to `nil`.
-        public static func all(matching query: String, startingAt page: String? = nil) -> Paginated<Swiftagram.User.Collection> {
+        public static func all(matching query: String, startingAt page: String? = nil) -> Results<Swiftagram.User.Collection> {
+            // TODO: Add back pagination.
             base.search
-                .appending(query: "q", with: query)
-                .paginating(process: Swiftagram.User.Collection.self, value: page)
-                .locking(Secret.self)
+                .query(appending: query, forKey: "q")
+                .finalize()
         }
     }
 }

@@ -18,18 +18,19 @@ public extension Endpoint {
         /// A media matching `identifier`'s info.
         ///
         /// - parameter identifier: A `String` holding reference to a valid media identifier.
-        public static func summary(for identifier: String) -> Disposable<Swiftagram.Media.Collection> {
-            base.appending(path: identifier)
+        public static func summary(for identifier: String) -> Results<Swiftagram.Media.Collection> {
+            base.path(appending: identifier)
                 .info
-                .prepare(process: Swiftagram.Media.Collection.self)
-                .locking(Secret.self)
+                .finalize()
         }
 
         /// The permalinkg for the media matching `identifier`.
         ///
         /// - parameter identifier: A `String` holding reference to a valid media identifier.
-        public static func permalink(for identifier: String) -> Disposable<Wrapper> {
-            base.appending(path: identifier).permalink.prepare().locking(Secret.self)
+        public static func permalink(for identifier: String) -> Results<Wrapper> {
+            base.path(appending: identifier)
+                .permalink
+                .finalize()
         }
     }
 }
@@ -42,11 +43,11 @@ public extension Endpoint.Media {
         /// - parameters:
         ///     - identifier: A `String` holding reference to a valid post media identifier.
         ///     - page: An optional `String` holding reference to a valid cursor. Defaults to `nil`.
-        public static func likers(for identifier: String, startingAt page: String? = nil) -> Endpoint.Paginated<Swiftagram.User.Collection> {
-            base.appending(path: identifier)
+        public static func likers(for identifier: String, startingAt page: String? = nil) -> Endpoint.Results<Swiftagram.User.Collection> {
+            // TODO: Add back pagination.
+            base.path(appending: identifier)
                 .likers
-                .paginating(process: Swiftagram.User.Collection.self, value: page)
-                .locking(Secret.self)
+                .finalize()
         }
 
         /// A list of all comments the media matching `identifier`.
@@ -54,86 +55,85 @@ public extension Endpoint.Media {
         /// - parameters:
         ///     - identifier: A `String` holding reference to a valid post media identifier.
         ///     - page: An optional `String` holding reference to a valid cursor. Defaults to `nil`.
-        public static func comments(for identifier: String, startingAt page: String? = nil) -> Endpoint.Paginated<Comment.Collection> {
-            base.appending(path: identifier)
+        public static func comments(for identifier: String, startingAt page: String? = nil) -> Endpoint.Results<Comment.Collection> {
+            // TODO: Add back pagination.
+            base.path(appending: identifier)
                 .comments
-                .paginating(process: Comment.Collection.self, value: page)
-                .locking(Secret.self)
+                .finalize()
         }
 
         /// Save the media metching `identifier`.
         ///
         /// - parameter identifier: A `String` holding reference to a valid media identifier.
-        public static func save(_ identifier: String) -> Endpoint.Disposable<Status> {
-            base.appending(path: identifier)
-                .appending(path: "save/")
-                .replacing(method: .post)
-                .prepare(process: Status.self)
-                .locking(Secret.self)
+        public static func save(_ identifier: String) -> Endpoint.Results<Status> {
+            base.path(appending: identifier)
+                .path(appending: "save/")
+                .method(.post)
+                .finalize()
         }
 
         /// Unsave the media metching `identifier`.
         ///
         /// - parameter identifier: A `String` holding reference to a valid media identifier.
-        public static func unsave(_ identifier: String) -> Endpoint.Disposable<Status> {
-            base.appending(path: identifier)
-                .appending(path: "unsave/")
-                .replacing(method: .post)
-                .prepare(process: Status.self)
-                .locking(Secret.self)
+        public static func unsave(_ identifier: String) -> Endpoint.Results<Status> {
+            base.path(appending: identifier)
+                .path(appending: "unsave/")
+                .method(.post)
+                .finalize()
         }
 
         /// Like the comment matching `identifier`.
         ///
         /// - parameter identifier: A `String` holding reference to a valid comment identfiier.
-        public static func like(comment identifier: String) -> Endpoint.Disposable<Status> {
-            base.appending(path: identifier)
-                .appending(path: "comment_like/")
-                .replacing(method: .post)
-                .prepare(process: Status.self)
-                .locking(Secret.self)
+        public static func like(comment identifier: String) -> Endpoint.Results<Status> {
+            base.path(appending: identifier)
+                .path(appending: "comment_like/")
+                .method(.post)
+                .finalize()
         }
 
         /// Unlike the comment matching `identifier`.
         ///
         /// - parameter identifier: A `String` holding reference to a valid comment identfiier.
-        public static func unlike(comment identifier: String) -> Endpoint.Disposable<Status> {
-            base.appending(path: identifier)
-                .appending(path: "comment_unlike/")
-                .replacing(method: .post)
-                .prepare(process: Status.self)
-                .locking(Secret.self)
+        public static func unlike(comment identifier: String) -> Endpoint.Results<Status> {
+            base.path(appending: identifier)
+                .path(appending: "comment_unlike/")
+                .method(.post)
+                .finalize()
         }
 
         /// Liked media.
         ///
         /// - parameter page: An optional `String` holding reference to a valid cursor. Defaults to `nil`.
-        public static func liked(startingAt page: String? = nil) -> Endpoint.Paginated<Swiftagram.Media.Collection> {
-            Endpoint.version1.feed.appendingDefaultHeader()
+        public static func liked(startingAt page: String? = nil) -> Endpoint.Results<Swiftagram.Media.Collection> {
+            // TODO: Add back pagination.
+            Endpoint.version1.feed
+                .appendingDefaultHeader()
                 .liked
-                .paginating(process: Swiftagram.Media.Collection.self, value: page)
-                .locking(Secret.self)
+                .finalize()
         }
 
         /// All saved media.
         ///
         /// - parameter page: An optional `String` holding reference to a valid cursor. Defaults to `nil`.
-        public static func saved(startingAt page: String? = nil) -> Endpoint.Paginated<Swiftagram.Media.Collection> {
-            Endpoint.version1.feed.appendingDefaultHeader()
+        public static func saved(startingAt page: String? = nil) -> Endpoint.Results<Swiftagram.Media.Collection> {
+            // TODO: Add back pagination.
+            Endpoint.version1.feed
+                .appendingDefaultHeader()
                 .saved
-                .appending(header: "include_igtv_preview", with: "false")
-                .paginating(process: Swiftagram.Media.Collection.self, value: page)
-                .locking(Secret.self)
+                .header(appending: "false", forKey: "include_igtv_preview")
+                .finalize()
         }
 
         /// All archived media.
         ///
         /// - parameter page: An optional `String` holding reference to a valid cursor. Defaults to `nil`.
-        public static func archived(startingAt page: String? = nil) -> Endpoint.Paginated<Swiftagram.Media.Collection> {
-            Endpoint.version1.feed.appending(path: "only_me_feed/")
+        public static func archived(startingAt page: String? = nil) -> Endpoint.Results<Swiftagram.Media.Collection> {
+            // TODO: Add back pagination.
+            Endpoint.version1.feed
+                .path(appending: "only_me_feed/")
                 .appendingDefaultHeader()
-                .paginating(process: Swiftagram.Media.Collection.self, value: page)
-                .locking(Secret.self)
+                .finalize()
         }
 
         /// All posts for user matching `identifier`.
@@ -141,12 +141,13 @@ public extension Endpoint.Media {
         /// - parameters:
         ///     - identifier: A `String` holding reference to a valid user identifier.
         ///     - page: An optional `String` holding reference to a valid cursor. Defaults to `nil`.
-        public static func owned(by identifier: String, startingAt page: String? = nil) -> Endpoint.Paginated<Swiftagram.Media.Collection> {
-            Endpoint.version1.feed.appendingDefaultHeader()
+        public static func owned(by identifier: String, startingAt page: String? = nil) -> Endpoint.Results<Swiftagram.Media.Collection> {
+            // TODO: Add back pagination.
+            Endpoint.version1.feed
                 .user
-                .appending(path: identifier)
-                .paginating(process: Swiftagram.Media.Collection.self, value: page)
-                .locking(Secret.self)
+                .path(appending: identifier)
+                .appendingDefaultHeader()
+                .finalize()
         }
 
         /// All posts a user matching `identifier` is tagged in.
@@ -154,13 +155,13 @@ public extension Endpoint.Media {
         /// - parameters
         ///     - identifier: A `String` holding reference to a valid user identifier.
         ///     - page: An optional `String` holding reference to a valid cursor. Defaults to `nil`.
-        public static func including(_ identifier: String, startingAt page: String? = nil) -> Endpoint.Paginated<Swiftagram.Media.Collection> {
+        public static func including(_ identifier: String, startingAt page: String? = nil) -> Endpoint.Results<Swiftagram.Media.Collection> {
+            // TODO: Add back pagination.
             Endpoint.version1.usertags
-                .appending(path: identifier)
+                .path(appending: identifier)
                 .feed
                 .appendingDefaultHeader()
-                .paginating(process: Swiftagram.Media.Collection.self, value: page)
-                .locking(Secret.self)
+                .finalize()
         }
 
         /// All media matching `tag`.
@@ -168,57 +169,45 @@ public extension Endpoint.Media {
         /// - parameters:
         ///     - tag: A `String` holding reference to a valid _#tag_.
         ///     - page: An optional `String` holding reference to a valid cursor. Defaults to `nil`.
-        public static func tagged(with tag: String, startingAt page: String? = nil) -> Endpoint.Paginated<Swiftagram.Media.Collection> {
-            Endpoint.version1.feed.appendingDefaultHeader()
+        public static func tagged(with tag: String, startingAt page: String? = nil) -> Endpoint.Results<Swiftagram.Media.Collection> {
+            // TODO: Add back pagination.
+            Endpoint.version1.feed
                 .tag
-                .appending(path: tag)
-                .paginating(process: Swiftagram.Media.Collection.self, value: page)
-                .locking(Secret.self)
+                .path(appending: tag)
+                .appendingDefaultHeader()
+                .finalize()
         }
 
         /// Timeline.
         ///
         /// - parameter page: An optional `String` holding reference to a valid cursor. Defaults to `nil`.
-        public static func timeline(startingAt page: String? = nil) -> Endpoint.Paginated<Wrapper> {
-            Endpoint.version1.feed.appendingDefaultHeader()
-                .appending(path: "timeline/")
-                .prepare { request, response in
-                    guard let nextMaxId = try? response?.get().nextMaxId.string() else {
-                        return (try? request.appending(body: ["reason": "cold_start_fetch", "is_pull_to_refresh": "0"])) ?? request
-                    }
-                    return request.appending(query: ["max_id": nextMaxId, "reason": "pagination"])
-                }
-                .locking(Secret.self) {
-                    do {
-                        return try $0.appending(header: $1.header)
-                        .appending(header: [
-                            "X-Ads-Opt-Out": "0",
-                            "X-Google-AD-ID": $1.client.device.adIdentifier.uuidString,
-                            "X-DEVICE-ID": $1.client.device.identifier.uuidString,
-                            "X-FB": "1"
-                        ])
-                        .appending(body: [
-                            "is_prefetch": "0",
-                            "feed_view_info": "",
-                            "seen_posts": "",
-                            "phone_id": $1.client.device.phoneIdentifier.uuidString,
-                            "is_pull_to_refresh": "0",
-                            "battery_level": "72",
-                            "timezone_offset": "43200",
-                            "_csrftoken": $1["csrftoken"]!,
-                            "client_session_id": $1["sessionid"]!,
-                            "device_id": $1.client.device.identifier.uuidString,
-                            "_uuid": $1.client.device.identifier.uuidString,
-                            "is_charging": "0",
-                            "is_async_ads_in_headload_enabled": "0",
-                            "rti_delivery_backend": "0",
-                            "is_async_ads_double_request": "0",
-                            "will_sound_on": "0",
-                            "is_async_ads_rti": "0"
-                        ])
-                    } catch {
-                        fatalError(error.localizedDescription)
-                    }
+        public static func timeline(startingAt page: String? = nil) -> Endpoint.Results<Wrapper> {
+            // TODO: Add back pagination.
+            Endpoint.version1.feed
+                .appendingDefaultHeader()
+                .path(appending: "timeline/")
+                .finalize {
+                    $0.header(appending: ["X-Ads-Opt-Out": "0",
+                                          "X-Google-AD-ID": $2.client.device.adIdentifier.uuidString,
+                                          "X-DEVICE-ID": $2.client.device.identifier.uuidString,
+                                          "X-FB": "1"])
+                        .body(appending: ["is_prefetch": "0",
+                                          "feed_view_info": "",
+                                          "seen_posts": "",
+                                          "phone_id": $2.client.device.phoneIdentifier.uuidString,
+                                          "is_pull_to_refresh": "0",
+                                          "battery_level": "72",
+                                          "timezone_offset": "43200",
+                                          "_csrftoken": $2["csrftoken"]!,
+                                          "client_session_id": $2["sessionid"]!,
+                                          "device_id": $2.client.device.identifier.uuidString,
+                                          "_uuid": $2.client.device.identifier.uuidString,
+                                          "is_charging": "0",
+                                          "is_async_ads_in_headload_enabled": "0",
+                                          "rti_delivery_backend": "0",
+                                          "is_async_ads_double_request": "0",
+                                          "will_sound_on": "0",
+                                          "is_async_ads_rti": "0"])
                 }
         }
     }
@@ -228,34 +217,31 @@ public extension Endpoint.Media {
     /// A module-like `enum` holding reference to `media` `Endpoint`s reguarding stories. Requires authentication.
     enum Stories {
         /// Stories tray.
-        public static let followed: Endpoint.Disposable<TrayItem.Collection> = Endpoint.version1.feed
+        public static let followed: Endpoint.Results<TrayItem.Collection> = Endpoint.version1.feed
             .reels_tray
             .appendingDefaultHeader()
-            .prepare(process: TrayItem.Collection.self)
-            .locking(Secret.self)
-
+            .finalize()
+        
         /// Return the highlights tray for a specific user.
         ///
         /// - parameter identifier: A `String` holding reference to a valid user identifier.
         /// - warning: This method will be removed in `4.2.0`.
-        public static func highlights(for identifier: String) -> Endpoint.Disposable<TrayItem.Collection> {
-            Endpoint.version1.highlights.appendingDefaultHeader()
-                .appending(path: identifier)
+        public static func highlights(for identifier: String) -> Endpoint.Results<TrayItem.Collection> {
+            Endpoint.version1.highlights
+                .path(appending: identifier)
                 .highlights_tray
-                .prepare(process: TrayItem.Collection.self)
-                .locking(Secret.self) {
-                    $0.appending(query: [
-                        "supported_capabilities_new": try? SupportedCapabilities
-                            .default
-                            .map { ["name": $0.key, "value": $0.value] }
-                            .wrapped
-                            .jsonRepresentation(),
-                        "phone_id": $1.client.device.phoneIdentifier.uuidString,
-                        "battery_level": "72",
-                        "is_charging": "0",
-                        "will_sound_on": "0"
-                    ]).appending(header: $1.header)
-            }
+                .appendingDefaultHeader()
+                .finalize {
+                    $0.query(["supported_capabilities_new": try? SupportedCapabilities
+                                .default
+                                .map { ["name": $0.key, "value": $0.value] }
+                                .wrapped
+                                .jsonRepresentation(),
+                            "phone_id": $2.client.device.phoneIdentifier.uuidString,
+                            "battery_level": "72",
+                            "is_charging": "0",
+                            "will_sound_on": "0"])
+                }
         }
 
         /// A list of all viewers for the story matching `identifier`.
@@ -263,47 +249,47 @@ public extension Endpoint.Media {
         /// - parameters:
         ///     - identifier: A `String` holding reference to a valid post media identifier.
         ///     - page: An optional `String` holding reference to a valid cursor. Defaults to `nil`.
-        public static func viewers(for identifier: String, startingAt page: String? = nil) -> Endpoint.Paginated<Swiftagram.User.Collection> {
-            base.appending(path: identifier)
-                .appending(path: "list_reel_media_viewer")
-                .paginating(process: Swiftagram.User.Collection.self, value: page)
-                .locking(Secret.self)
+        public static func viewers(for identifier: String, startingAt page: String? = nil) -> Endpoint.Results<Swiftagram.User.Collection> {
+            // TODO: Add back pagination.
+            base.path(appending: identifier)
+                .path(appending: "list_reel_media_viewer")
+                .finalize()
         }
 
         /// Archived stories.
         ///
         /// - parameter page: An optional `String` holding reference to a valid cursor. Defaults to `nil`.
-        public static func archived(startingAt page: String? = nil) -> Endpoint.Paginated<TrayItem.Collection> {
+        public static func archived(startingAt page: String? = nil) -> Endpoint.Results<TrayItem.Collection> {
+            // TODO: Add back pagination.
             Endpoint.version1
                 .archive
                 .reel
                 .day_shells
                 .appendingDefaultHeader()
-                .paginating(process: TrayItem.Collection.self, value: page)
-                .locking(Secret.self)
+                .finalize()
         }
 
         /// All available stories for user matching `identifier`.
         ///
         /// - parameter identifier: A `String` holding reference to a valid user identifier.
-        public static func owned(by identifier: String) -> Endpoint.Disposable<TrayItem.Unit> {
-            Endpoint.version1.feed.appendingDefaultHeader()
+        public static func owned(by identifier: String) -> Endpoint.Results<TrayItem.Unit> {
+            Endpoint.version1.feed
                 .user
-                .appending(path: identifier)
+                .path(appending: identifier)
                 .reel_media
-                .prepare(process: TrayItem.Unit.self)
-                .locking(Secret.self)
+                .appendingDefaultHeader()
+                .finalize()
         }
 
         /// All available stories for user matching `identifiers`.
         /// 
         /// - parameters identifiers: A `Collection` of `String`s holding reference to valud user identifiers.
-        public static func owned<C: Collection>(by identifiers: C) -> Endpoint.Disposable<TrayItem.Dictionary> where C.Element == String {
-            Endpoint.version1.feed.appending(path: "reels_media/")
+        public static func owned<C: Collection>(by identifiers: C) -> Endpoint.Results<TrayItem.Dictionary> where C.Element == String {
+            try! Endpoint.version1.feed
+                .path(appending: "reels_media/")
                 .appendingDefaultHeader()
-                .replacing(body: ["user_ids": try? Array(identifiers).wrapped.jsonRepresentation()])
-                .prepare(process: TrayItem.Dictionary.self)
-                .locking(Secret.self)
+                .body(["user_ids": try? Array(identifiers).wrapped.jsonRepresentation()])
+                .finalize()
         }
     }
 }

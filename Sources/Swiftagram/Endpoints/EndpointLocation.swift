@@ -18,50 +18,42 @@ public extension Endpoint {
         ///     - coordinates: A `CGPoint` with latitude and longitude.
         ///     - query: An optional `String` narrowing down the list. Defaults to `nil`.
         public static func around(coordinates: Swiftagram.Location.Coordinates,
-                                  matching query: String? = nil) -> Disposable<Swiftagram.Location.Collection> {
+                                  matching query: String? = nil) -> Results<Swiftagram.Location.Collection> {
             Endpoint.version1
                 .appendingDefaultHeader()
-                .appending(path: "location_search/")
-                .appending(query: [
-                    "rank_token": "",
-                    "latitude": "\(coordinates.latitude)",
-                    "longitude": "\(coordinates.longitude)",
-                    "timestamp": query == nil ? "\(Int(Date().timeIntervalSince1970*1_000))" : nil,
-                    "search_query": query
-                ])
-                .prepare(process: Swiftagram.Location.Collection.self)
-                .locking(Secret.self) {
-                    $0.appending(header: $1.header)
-                        .appending(query: [
-                            "_csrftoken": $1["csrftoken"]!,
-                            "_uid": $1.identifier,
-                            "_uuid": $1.client.device.identifier.uuidString
-                        ])
+                .path(appending: "location_search/")
+                .query(["rank_token": "",
+                        "latitude": "\(coordinates.latitude)",
+                        "longitude": "\(coordinates.longitude)",
+                        "timestamp": query == nil ? "\(Int(Date().timeIntervalSince1970*1_000))" : nil,
+                        "search_query": query])
+                .finalize {
+                    $0.query(appending: ["_csrftoken": $2["csrftoken"]!,
+                                         "_uid": $2.label,
+                                         "_uuid": $2.client.device.identifier.uuidString])
                 }
         }
-
+        
         /// Get the summary for the location matching `identifier`.
         ///
         /// - parameter identifier: A valid location identifier.
-        public static func summary(for identifier: String) -> Disposable<Swiftagram.Location.Unit> {
+        public static func summary(for identifier: String) -> Results<Swiftagram.Location.Unit> {
             Endpoint.version1
                 .locations
-                .appending(path: identifier)
-                .appending(path: "info/")
-                .prepare(process: Swiftagram.Location.Unit.self)
-                .locking(Secret.self)
+                .path(appending: identifier)
+                .path(appending: "info/")
+                .finalize()
         }
-
+        
         /// Fetch stories currently available at the location matching `identifier`.
         ///
         /// - parameter identifier: A valid location identifier.
-        public static func stories(at identifier: String) -> Disposable<TrayItem.Unit> {
+        public static func stories(at identifier: String) -> Results<TrayItem.Unit> {
             Endpoint.version1
                 .locations
-                .appending(path: identifier)
-                .appending(path: "story/")
-                .prepare(process: TrayItem.Unit.self)
-                .locking(Secret.self)
+                .path(appending: identifier)
+                .path(appending: "story/")
+                .finalize()
         }
     }
 }

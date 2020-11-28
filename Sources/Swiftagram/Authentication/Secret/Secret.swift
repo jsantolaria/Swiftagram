@@ -15,12 +15,12 @@ import ComposableRequest
 /// just authenticate again, passing the new one to the `Authenticator`.
 ///
 /// - note: The information contained by any given instance of `Secret` is extremely sensitive. Please handle it with care.
-public struct Secret: HeaderKey {
+public struct Secret: Storable {
     /// The associated `Client`. Defaults to `.default`.
     public let client: Client
 
     /// The authenticated user primary key.
-    public let identifier: String
+    public let label: String
 
     /// All authentication cookies.
     ///
@@ -39,7 +39,7 @@ public struct Secret: HeaderKey {
               let identifier = cookies.first(where: { $0.name == "ds_user_id" })?.value else { return nil }
         self.cookies = cookies.compactMap(CodableHTTPCookie.init)
         self.client = client
-        self.identifier = identifier
+        self.label = identifier
     }
 
     // MARK: Codable
@@ -55,7 +55,7 @@ public struct Secret: HeaderKey {
         guard let identifier = cookies.first(where: { $0.name == "ds_user_id" })?.value else {
             throw ResponseError.generic("Identifier for `Secret` not found.")
         }
-        self.identifier = identifier
+        self.label = identifier
         // If `client` is non-`nil`, we do not need to upgrade the device.
         if let client = try container.decodeIfPresent(Client.self, forKey: .client) {
             self.cookies = cookies
