@@ -207,6 +207,8 @@ public struct Media: ReflectedType {
         (self["user"].optional() ?? self["owner"].optional())
             .flatMap(User.init)
     }
+    
+    public var totalViewerCount: Int? { self["totalViewerCount"].int() }
 
     /// The location of the media.
     public var location: Location? { self["location"].optional().flatMap(Location.init) }
