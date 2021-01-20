@@ -20,17 +20,11 @@ public struct Media: ReflectedType {
         public static let properties: [String: PartialKeyPath<Self>] = ["url": \Self.url,
                                                                         "size": \Self.size,
                                                                         "aspectRatio": \Self.aspectRatio,
-                                                                        "resolution": \Self.resolution,
-                                                                        "viewerCount": \Self.viewerCount,
-                                                                        "totalViewerCount": \Self.totalViewerCount]
+                                                                        "resolution": \Self.resolution]
 
         /// The underlying `Response`.
         public var wrapper: () -> Wrapper
 
-        public var viewerCount: Int? { self["viewerCount"].int() }
-        public var totalViewerCount: Int? { self["totalViewerCount"].int() }
-        public var viewers: [User] { self["viewers"].array()?.map(User.init) ?? [] }
-        
         /// The `url`.
         public var url: URL? { self["url"].url() }
         /// The `size` value.
