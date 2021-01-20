@@ -209,6 +209,7 @@ public struct Media: ReflectedType {
     }
     
     public var totalViewerCount: Int? { self["totalViewerCount"].int() }
+    public var viewers: [User] { self["viewers"].array()?.map(User.init) ?? [] }
 
     /// The location of the media.
     public var location: Location? { self["location"].optional().flatMap(Location.init) }
