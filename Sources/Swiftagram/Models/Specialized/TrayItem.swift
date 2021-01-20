@@ -64,6 +64,18 @@ public struct TrayItem: ReflectedType {
         self["seen"].date()
     }
 
+    public var updatedAt: Date? {
+        self["latestReelMedia"].date()
+    }
+
+    public func containsUnseenMedia() -> Bool {
+        if let lastSeenOn = lastSeenOn, let updatedAt = updatedAt {
+            return updatedAt > lastSeenOn
+        } else {
+            return true
+        }
+    }
+
     /// The user.
     public var user: User? { self["user"].optional().flatMap { User(wrapper: $0) }}
 
@@ -148,3 +160,4 @@ public extension TrayItem {
         }
     }
 }
+
