@@ -53,7 +53,7 @@ public struct TrayItem: ReflectedType {
     /// The cover media.
     public var cover: Media? { self["coverMedia"].optional().flatMap(Media.init) }
     /// The actual content.
-    public var items: [Media]? { self["items"].array()?.map(Media.init) }
+    public var items: [Media] { self["items"].array()?.map(Media.init) ?? [] }
 
     /// The expiration date of the tray item.
     public var expiringAt: Date? {
