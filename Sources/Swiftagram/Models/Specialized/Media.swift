@@ -20,10 +20,16 @@ public struct Media: ReflectedType {
         public static let properties: [String: PartialKeyPath<Self>] = ["url": \Self.url,
                                                                         "size": \Self.size,
                                                                         "aspectRatio": \Self.aspectRatio,
-                                                                        "resolution": \Self.resolution]
+                                                                        "resolution": \Self.resolution,
+                                                                        "viewerCount": \Self.viewerCount,
+                                                                        "totalViewerCount": \Self.totalViewerCount]
 
         /// The underlying `Response`.
         public var wrapper: () -> Wrapper
+
+        public var viewerCount: Int? { self["viewerCount"].int() }
+        public var totalViewerCount: Int? { self["totalViewerCount"].int() }
+        public var viewers: [User] { self["viewers"].array()?.map(User.init) ?? [] }
         
         /// The `url`.
         public var url: URL? { self["url"].url() }
@@ -164,18 +170,11 @@ public struct Media: ReflectedType {
                                                                     "likes": \Self.likes,
                                                                     "content": \Self.content,
                                                                     "user": \Self.user,
-                                                                    "location": \Self.location
-                                                                    "viewerCount": \Self.viewerCount,
-                                                                    "totalViewerCount": \Self.totalViewerCount,
-                                                                    "viewers": \Self.viewers]
+                                                                    "location": \Self.location]
 
     /// The underlying `Response`.
     public var wrapper: () -> Wrapper
 
-    public var viewerCount: Int? { self["viewerCount"].int() }
-    public var totalViewerCount: Int? { self["totalViewerCount"].int() }
-    public var viewers: [User] { self["viewers"].array()?.map(User.init) ?? [] }
-    
     /// The identifier.
     public var identifier: String! { (self["id"].optional() ?? self["mediaId"].optional())?.string(converting: true) }
     /// The primary key.
