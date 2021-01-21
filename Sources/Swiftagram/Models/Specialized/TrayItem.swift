@@ -72,7 +72,7 @@ public struct TrayItem: ReflectedType {
         if let lastSeenOn = lastSeenOn, let updatedAt = updatedAt {
             return updatedAt > lastSeenOn
         } else {
-            return true
+            return (availableCount ?? 0) > 0
         }
     }
 
@@ -160,4 +160,3 @@ public extension TrayItem {
         }
     }
 }
-
