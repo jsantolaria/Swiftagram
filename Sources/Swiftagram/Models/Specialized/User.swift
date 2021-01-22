@@ -75,6 +75,8 @@ public struct User: ReflectedType {
             .url() ?? self["hdProfilePicUrlInfo"]["url"].url()
     }
 
+    public var isBusiness: Bool? { self["isBusiness"].bool() }
+
     /// The current access status.
     public var access: Access? {
         if self["isPrivate"].bool() == nil && self["isVerified"].bool() == nil {
