@@ -7,19 +7,11 @@
 
 import Foundation
 
-public extension User {
-    /// The friendship status with the logged in user.
-    @available(*, deprecated, message: "Instagram changes mean this will always return `nil`; removing definition in `4.3.0`")
-    var friendship: Friendship? {
-        (self["friendship"].optional()
-            ?? self["friendshipStatus"].optional())
-            .flatMap(Friendship.init)
-    }
-}
+
 
 public extension Endpoint.Direct {
     /// All threads.
-    /// 
+    ///
     /// - parameter page: An optional `String` holding reference to a valid cursor. Defaults to `nil`.
     @available(*, deprecated, renamed: "inbox(startingAt:)", message: "removing definition in `4.3.0`")
     static func threads(startingAt page: String? = nil) -> Endpoint.Paginated<Conversation.Collection> {

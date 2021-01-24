@@ -54,6 +54,12 @@ public struct User: ReflectedType {
     /// The underlying `Response`.
     public var wrapper: () -> Wrapper
 
+    public var friendship: Friendship? {
+        (self["friendship"].optional()
+            ?? self["friendshipStatus"].optional())
+            .flatMap(Friendship.init)
+    }
+
     /// The identifier.
     public var identifier: String! { self["pk"].string(converting: true) }
     /// The username.
