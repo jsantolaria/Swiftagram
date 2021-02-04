@@ -20,7 +20,7 @@ public struct TrayItem: ReflectedType {
                                                                     "availableCount": \Self.availableCount,
                                                                     "fetchedCount": \Self.fetchedCount,
                                                                     "title": \Self.title,
-                                                                    "latestMediaPrimaryKey": \Self.latestMediaPrimaryKey,
+                                                                    "latestMediaDate": \Self.latestMediaDate,
                                                                     "cover": \Self.cover,
                                                                     "items": \Self.items,
                                                                     "expiringAt": \Self.expiringAt,
@@ -49,7 +49,7 @@ public struct TrayItem: ReflectedType {
             ?? user?.username
     }
     /// The last media primary key.
-    public var latestMediaPrimaryKey: Int? { self["latestReelMedia"].int() }
+    public var latestMediaDate: Date? { self["latestReelMedia"].date() }
     /// The cover media.
     public var cover: Media? { self["coverMedia"].optional().flatMap(Media.init) }
     /// The actual content.
